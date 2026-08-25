@@ -589,6 +589,13 @@ export type MixTurn = {
     role: "user" | "assistant";
     /** 正文（assistant 侧已剥离小票块） */
     text: string;
+    /**
+     * 这一轮的原始输出（assistant 侧）：进剥离/滤网/机括之前的完整原文，
+     * 含机括标记行与被滤网洗掉的字；状态栏补写的块也并在里面（它算这一轮产出的一部分）。
+     * 「编辑原始输出」展示并回写的就是这一份；老数据没有这个字段，
+     * 编辑时退回用产物拼装（mixTurnRawText 的兜底路径）。
+     */
+    rawText?: string;
     /** 该轮小票壳内原文（有小票材料且 AI 按契约输出时才有）；多块时为第一块，全量见 ticketRaws */
     ticketRaw?: string;
     /** 该轮小剧场壳内原文（尾调写了契约且 AI 输出时才有）；多块时为第一块，全量见 encoreRaws */
@@ -645,12 +652,6 @@ export type MixSession = {
      */
     mechanismStorePrev?: Record<string, Record<string, string>>;
     mechanismStorePrevTurn?: string;
-    /**
-     * 同一轮出杯后钩子跑完的存储快照：和当前存储一对比就知道出杯之后
-     * 玩家有没有在面板里手改过数据。没改过 → 编辑原文后静默替换重跑；
-     * 改过 → 弹窗问（替换会把手改的一起滚掉）。
-     */
-    mechanismStorePost?: Record<string, Record<string, string>>;
     /**
      * 玩家自己拖动/缩放过的面板位置（materialId → 摆放），只在这一局有效。
      * 不写回材料：材料是作者的作品，玩家挪一下自己的屏幕不该改到别人的作品。
